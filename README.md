@@ -1,18 +1,18 @@
-# Práctica 4 — Seguridad Informática
+# Práctica de SQL Injection — Seguridad Informática
 
-Proyecto académico sobre **SQL Injection**: una aplicación web vulnerable en Flask/SQLite, su explotación, su mitigación, y módulos de escaneo de red y seguridad en bases de datos.
+PEn este proyecto armamos una aplicación web con Flask y SQLite que es vulnerable a propósito, para ver cómo funciona un ataque de SQL Injection desde adentro: primero lo explotamos y después lo corregimos. También incluimos dos módulos extra, uno para escanear la red y otro para revisar la seguridad de la base de datos.
 
-⚠️ Este código contiene vulnerabilidades **intencionales** con fines educativos. No usar en producción.
+El código contiene vulnerabilidades **intencionales** con fines de aprendizaje y práctica. 
 
 ## Integrantes
 
-- (Iza Verdesoto Maribel Del Rocio)
-- (Lojan Malla Ana Elizabeth)
-- (Macias Moya Jessica Jessenia)
-- (Quishpe Herrera Jefefrson Camilo)
-- (Suarez Cevallos Juana Paola)
-- (Toaquiza Sillo Joselyn Aracely)
-- (Zambrano Rodriguez Jose Antonio)
+- Iza Verdesoto Maribel Del Rocio
+- Lojan Malla Ana Elizabeth
+- Macias Moya Jessica Jessenia
+- Quishpe Herrera Jefefrson Camilo
+- Suarez Cevallos Juana Paola
+- Toaquiza Sillo Joselyn Aracely
+- Zambrano Rodriguez Jose Antonio
 
 ## Estructura del repositorio
 
@@ -45,6 +45,24 @@ python app_vulnerable.py
 ```
 
 Luego abrir en el navegador: http://127.0.0.1:5000
+
+## Usuarios de prueba
+
+Para probar el login normal, la base de datos ya viene con estos usuarios cargados:
+
+| Usuario | Contraseña | Rol           |
+|---------|------------|---------------|
+| admin   | admin123   | administrador |
+| joss    | clave2026  | usuario       |
+| jeff    | seguridad1 | usuario       |
+
+## Cómo probar la vulnerabilidad
+
+En el campo de usuario, ingresar:
+
+admin’ --
+
+Y en contraseña, cualquier texto. El sistema concede el acceso sin validar la contraseña real, porque el `--` convierte el resto de la consulta SQL en un comentario.
 
 ## Advertencia de uso responsable
 
