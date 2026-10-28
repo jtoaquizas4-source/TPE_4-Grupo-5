@@ -2,79 +2,187 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Práctica 4 - Login (demo vulnerable)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Grupo 5 · Práctica 4 — Seguridad Informática</title>
     <style>
+        :root {
+            --azul-oscuro: #0f2744;
+            --azul: #1e3a5f;
+            --acento: #3b82f6;
+            --acento-claro: #60a5fa;
+            --texto: #1f2937;
+            --gris: #6b7280;
+            --borde: #e5e7eb;
+            --exito: #16a34a;
+            --error: #dc2626;
+        }
+
+        * { box-sizing: border-box; }
+
         body {
-            font-family: Arial, sans-serif;
-            background: #f4f4f4;
+            margin: 0;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--azul-oscuro) 0%, var(--azul) 45%, var(--acento) 100%);
+            padding: 20px;
         }
-        .caja {
-            background: white;
-            padding: 30px 40px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.15);
-            width: 320px;
+
+        .tarjeta {
+            background: #ffffff;
+            width: 100%;
+            max-width: 380px;
+            border-radius: 14px;
+            box-shadow: 0 20px 45px rgba(15, 39, 68, 0.35);
+            overflow: hidden;
         }
-        h1 {
-            font-size: 20px;
+
+        .encabezado {
+            background: linear-gradient(120deg, var(--azul-oscuro), var(--acento));
+            padding: 28px 30px 22px;
+            color: white;
             text-align: center;
-            color: #333;
         }
+
+        .badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.35);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .encabezado h1 {
+            margin: 0;
+            font-size: 19px;
+            font-weight: 600;
+        }
+
+        .encabezado p {
+            margin: 6px 0 0;
+            font-size: 12.5px;
+            opacity: 0.85;
+        }
+
+        .cuerpo {
+            padding: 28px 30px 30px;
+        }
+
         label {
             display: block;
-            margin-top: 12px;
-            margin-bottom: 4px;
-            font-size: 14px;
-            color: #555;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--texto);
+            margin-bottom: 6px;
+            margin-top: 16px;
         }
+        label:first-of-type { margin-top: 0; }
+
         input {
             width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        button {
-            margin-top: 18px;
-            width: 100%;
-            padding: 10px;
-            background: #2d6cdf;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .mensaje {
-            margin-top: 16px;
-            padding: 10px;
-            border-radius: 4px;
-            background: #eee;
+            padding: 11px 12px;
+            border: 1.5px solid var(--borde);
+            border-radius: 8px;
             font-size: 14px;
-            word-break: break-word;
+            color: var(--texto);
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
+
+        input:focus {
+            outline: none;
+            border-color: var(--acento);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+
+        button {
+            margin-top: 22px;
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(120deg, var(--acento), var(--acento-claro));
+            color: white;
+            font-size: 14.5px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.35);
+        }
+
+        .mensaje {
+            margin-top: 18px;
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            line-height: 1.4;
+            word-break: break-word;
+            background: #f3f4f6;
+            border-left: 4px solid var(--gris);
+            color: var(--texto);
+        }
+
+        .mensaje.exito {
+            background: #f0fdf4;
+            border-left-color: var(--exito);
+            color: #166534;
+        }
+
+        .mensaje.error {
+            background: #fef2f2;
+            border-left-color: var(--error);
+            color: #991b1b;
+        }
+
+        .pie {
+            margin-top: 22px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--gris);
+            border-top: 1px solid var(--borde);
+            padding-top: 14px;
+        }
+
+        .pie strong { color: var(--texto); }
     </style>
 </head>
 <body>
-    <div class="caja">
-        <h1>Práctica 4: Sistema de acceso</h1>
-        <form method="POST" action="/login">
-            <label for="username">Usuario</label>
-            <input type="text" id="username" name="username" autocomplete="off">
+    <div class="tarjeta">
+        <div class="encabezado">
+            <span class="badge">SEGURIDAD INFORMÁTICA · TPE 4</span>
+            <h1>Portal de Acceso</h1>
+            <p>Demostración académica de SQL Injection</p>
+        </div>
 
-            <label for="password">Contraseña</label>
-            <input type="text" id="password" name="password" autocomplete="off">
+        <div class="cuerpo">
+            <form method="POST" action="/login">
+                <label for="username">Usuario</label>
+                <input type="text" id="username" name="username" autocomplete="off" placeholder="Ingresa tu usuario">
 
-            <button type="submit">Ingresar</button>
-        </form>
+                <label for="password">Contraseña</label>
+                <input type="text" id="password" name="password" autocomplete="off" placeholder="Ingresa tu contraseña">
 
-        {% if mensaje %}
-        <div class="mensaje">{{ mensaje }}</div>
-        {% endif %}
+                <button type="submit">Iniciar sesión</button>
+            </form>
+
+            {% if mensaje %}
+            <div class="mensaje {{ 'exito' if '✅' in mensaje else ('error' if '❌' in mensaje else '') }}">
+                {{ mensaje }}
+            </div>
+            {% endif %}
+
+            <div class="pie">
+                <strong>Grupo 5</strong> · Maribel Iza . Ana Lojan · Jessica Macias · Jefefrson Quishpe · Juana  Suarez · Joselyn Toaquiza · José Zambrano
+            </div>
+        </div>
     </div>
 </body>
 </html>

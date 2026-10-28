@@ -6,13 +6,13 @@ Proyecto académico sobre **SQL Injection**: una aplicación web vulnerable en F
 
 ## Integrantes
 
-- (nombre 1)
-- (nombre 2)
-- (nombre 3)
-- (nombre 4)
-- (nombre 5)
-- (nombre 6)
-- (nombre 7)
+- (Iza Verdesoto Maribel Del Rocio)
+- (Lojan Malla Ana Elizabeth)
+- (Macias Moya Jessica Jessenia)
+- (Quishpe Herrera Jefefrson Camilo)
+- (Suarez Cevallos Juana Paola)
+- (Toaquiza Sillo Joselyn Aracely)
+- (Zambrano Rodriguez Jose Antonio)
 
 ## Estructura del repositorio
 
