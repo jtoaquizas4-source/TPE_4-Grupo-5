@@ -1,6 +1,6 @@
 # Práctica de SQL Injection — Seguridad Informática
 
-PEn este proyecto armamos una aplicación web con Flask y SQLite que es vulnerable a propósito, para ver cómo funciona un ataque de SQL Injection desde adentro: primero lo explotamos y después lo corregimos. También incluimos dos módulos extra, uno para escanear la red y otro para revisar la seguridad de la base de datos.
+En este proyecto armamos una aplicación web con Flask y SQLite que es vulnerable a propósito, para ver cómo funciona un ataque de SQL Injection desde adentro: primero lo explotamos y después lo corregimos. También incluimos dos módulos extra, uno para escanear la red y otro para revisar la seguridad de la base de datos.
 
 El código contiene vulnerabilidades **intencionales** con fines de aprendizaje y práctica. 
 
