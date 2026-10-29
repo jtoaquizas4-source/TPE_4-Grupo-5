@@ -77,13 +77,14 @@ def login():
     conn = get_connection()
     cursor = conn.cursor()
 
-    # --- LÍNEA VULNERABLE ---
-    # Concatenamos el texto del usuario directo en la consulta.
-    query = f"SELECT * FROM usuarios WHERE username = '{username}' AND password = '{password}'"
-    print("Consulta ejecutada:", query)  # Ayuda a ver en consola qué SQL se arma
+    # --- MITIGACIÓN DE SQL INJECTION ---
+    # Utilizamos consultas parametrizadas para evitar
+    # que los datos del usuario se interpreten como código SQL.
+    query = "SELECT * FROM usuarios WHERE username = ? AND password = ?"
+    print("Consulta parametrizada:", query)
 
     try:
-        cursor.execute(query)
+        cursor.execute(query, (username, password))
         resultado = cursor.fetchone()
     except sqlite3.OperationalError as error:
         conn.close()
