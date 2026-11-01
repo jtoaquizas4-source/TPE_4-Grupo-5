@@ -1,108 +1,149 @@
+
 """
-app_vulnerable.py
+Práctica Experimental 4 - Seguridad Informática
+Aplicación segura contra SQL Injection.
 
-Aplicación web de demostración académica (Práctica 4 - Seguridad Informática).
-Contiene una vulnerabilidad INTENCIONAL de SQL Injection en el formulario
-de inicio de sesión, con el fin de estudiar cómo se explota y cómo se
-corrige. NO usar este código en un proyecto real.
+Objetivo:
+Demostrar cómo las consultas parametrizadas permiten
+evitar la inyección SQL en un formulario de inicio de sesión.
 
-Cómo es vulnerable:
-En la función login(), el usuario y la contraseña que llegan desde el
-formulario se insertan directamente dentro del texto de la consulta SQL
-usando f-strings (concatenación). Si alguien escribe caracteres especiales
-de SQL (como comillas simples y la palabra OR), puede alterar el
-significado de la consulta y entrar sin conocer una contraseña real.
+Esta aplicación se compara con app_vulnerable.py.
+
+Uso académico en un entorno local autorizado.
 """
 
-from flask import Flask, render_template, request
-import sqlite3
 import os
+import sqlite3
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "usuarios.db")
+DB_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    "usuarios.db"
+)
 
 
 def get_connection():
-    """Abre una conexión a la base de datos SQLite."""
+    """Establece conexión con la base de datos SQLite."""
     return sqlite3.connect(DB_PATH)
 
 
 def init_db():
-    """Crea la base de datos y algunos usuarios de ejemplo, solo si no existe."""
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute(
-        """
-        CREATE TABLE IF NOT EXISTS usuarios (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL,
-            password TEXT NOT NULL,
-            rol TEXT NOT NULL
-        )
-        """
-    )
-    # Solo insertamos datos de ejemplo si la tabla está vacía
-    cursor.execute("SELECT COUNT(*) FROM usuarios")
-    if cursor.fetchone()[0] == 0:
-        cursor.executemany(
-            "INSERT INTO usuarios (username, password, rol) VALUES (?, ?, ?)",
-            [
-                ("admin", "admin123", "administrador"),
-                ("joss", "clave2026", "usuario"),
-                ("jeff", "seguridad1", "usuario"),
-            ],
-        )
+    """Crea la tabla e inserta usuarios de prueba si está vacía."""
+
+    with get_connection() as conn:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS usuarios (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT NOT NULL,
+                password TEXT NOT NULL,
+                rol TEXT NOT NULL
+            )
+        """)
+
+        cursor.execute("SELECT COUNT(*) FROM usuarios")
+
+        if cursor.fetchone()[0] == 0:
+            cursor.executemany(
+                """
+                INSERT INTO usuarios (username, password, rol)
+                VALUES (?, ?, ?)
+                """,
+                [
+                    ("admin", "admin123", "administrador"),
+                    ("joss", "clave2026", "usuario"),
+                    ("jeff", "seguridad1", "usuario")
+                ]
+            )
+
         conn.commit()
-    conn.close()
 
 
 @app.route("/", methods=["GET"])
 def home():
-    """Página principal: solo muestra el formulario de login."""
-    return render_template("login.html", mensaje=None)
+    """Muestra el formulario de inicio de sesión."""
+
+    return render_template(
+        "login.html",
+        mensaje=None
+    )
 
 
 @app.route("/login", methods=["POST"])
 def login():
-    """
-    Procesa el formulario de login.
+    """Valida las credenciales mediante una consulta segura."""
 
-    *** ESTA CONSULTA ES VULNERABLE A PROPÓSITO ***
-    El usuario y la contraseña se insertan directamente en el texto SQL.
-    """
     username = request.form.get("username", "")
     password = request.form.get("password", "")
 
-    conn = get_connection()
-    cursor = conn.cursor()
+    # MITIGACIÓN DE SQL INJECTION:
+    # Los valores ingresados se envían por separado.
+    # No se concatenan con la consulta SQL.
 
-    # --- MITIGACIÓN DE SQL INJECTION ---
-    # Utilizamos consultas parametrizadas para evitar
-    # que los datos del usuario se interpreten como código SQL.
-    query = "SELECT * FROM usuarios WHERE username = ? AND password = ?"
+    query = (
+        "SELECT * FROM usuarios "
+        "WHERE username = ? AND password = ?"
+    )
+
+    print("\n--- PRUEBA DE AUTENTICACIÓN ---")
+    print("Aplicación: SEGURA")
     print("Consulta parametrizada:", query)
 
+    conn = get_connection()
+
     try:
-        cursor.execute(query, (username, password))
-        resultado = cursor.fetchone()
-    except sqlite3.OperationalError as error:
-        conn.close()
-        return render_template(
-            "login.html", mensaje=f"Error en la consulta SQL: {error}"
+        cursor = conn.cursor()
+
+        cursor.execute(
+            query,
+            (username, password)
         )
 
-    conn.close()
+        resultado = cursor.fetchone()
 
-    if resultado:
+    except sqlite3.Error as error:
+        print("Resultado: ERROR SQL")
+        print("Detalle:", error)
+
         return render_template(
             "login.html",
-            mensaje=f"✅ Acceso concedido. Bienvenido, {resultado[1]} (rol: {resultado[3]}).",
+            mensaje="Error al procesar la consulta."
         )
-    else:
-        return render_template("login.html", mensaje="❌ Usuario o contraseña incorrectos.")
+
+    finally:
+        conn.close()
+
+    if resultado:
+        print("Resultado: ACCESO CONCEDIDO")
+
+        return render_template(
+            "login.html",
+            mensaje=(
+                f"Acceso concedido. Bienvenido, "
+                f"{resultado[1]} (rol: {resultado[3]})."
+            )
+        )
+
+    print("Resultado: ACCESO RECHAZADO")
+
+    return render_template(
+        "login.html",
+        mensaje="Usuario o contraseña incorrectos."
+    )
 
 
 if __name__ == "__main__":
     init_db()
-    app.run(debug=True, host="127.0.0.1", port=5000)
+
+    print("Iniciando aplicación segura...")
+    print("Dirección: http://127.0.0.1:5000")
+    print("Entorno de pruebas local y autorizado.")
+
+    app.run(
+        host="127.0.0.1",
+        port=5000,
+        debug=False
+    )

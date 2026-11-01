@@ -1,9 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Grupo 5 · Práctica 4 — Seguridad Informática</title>
+    <title>Grupo 5 - Práctica 4 - Seguridad Informática</title>
+
     <style>
         :root {
             --azul-oscuro: #0f2744;
@@ -17,7 +19,9 @@
             --error: #dc2626;
         }
 
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
         body {
             margin: 0;
@@ -26,7 +30,12 @@
             justify-content: center;
             align-items: center;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, var(--azul-oscuro) 0%, var(--azul) 45%, var(--acento) 100%);
+            background: linear-gradient(
+                135deg,
+                var(--azul-oscuro) 0%,
+                var(--azul) 45%,
+                var(--acento) 100%
+            );
             padding: 20px;
         }
 
@@ -40,7 +49,11 @@
         }
 
         .encabezado {
-            background: linear-gradient(120deg, var(--azul-oscuro), var(--acento));
+            background: linear-gradient(
+                120deg,
+                var(--azul-oscuro),
+                var(--acento)
+            );
             padding: 28px 30px 22px;
             color: white;
             text-align: center;
@@ -48,8 +61,8 @@
 
         .badge {
             display: inline-block;
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.35);
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.35);
             padding: 4px 12px;
             border-radius: 20px;
             font-size: 12px;
@@ -81,7 +94,10 @@
             margin-bottom: 6px;
             margin-top: 16px;
         }
-        label:first-of-type { margin-top: 0; }
+
+        label:first-of-type {
+            margin-top: 0;
+        }
 
         input {
             width: 100%;
@@ -103,7 +119,11 @@
             margin-top: 22px;
             width: 100%;
             padding: 12px;
-            background: linear-gradient(120deg, var(--acento), var(--acento-claro));
+            background: linear-gradient(
+                120deg,
+                var(--acento),
+                var(--acento-claro)
+            );
             color: white;
             font-size: 14.5px;
             font-weight: 600;
@@ -151,37 +171,78 @@
             padding-top: 14px;
         }
 
-        .pie strong { color: var(--texto); }
+        .pie strong {
+            color: var(--texto);
+        }
     </style>
 </head>
+
 <body>
     <div class="tarjeta">
+
         <div class="encabezado">
-            <span class="badge">SEGURIDAD INFORMÁTICA · TPE 4</span>
+            <span class="badge">
+                SEGURIDAD INFORMÁTICA - TPE 4
+            </span>
+
             <h1>Portal de Acceso</h1>
-            <p>Demostración académica de SQL Injection</p>
+
+            <p>
+                Demostración académica de SQL Injection
+            </p>
         </div>
 
         <div class="cuerpo">
+
             <form method="POST" action="/login">
-                <label for="username">Usuario</label>
-                <input type="text" id="username" name="username" autocomplete="off" placeholder="Ingresa tu usuario">
 
-                <label for="password">Contraseña</label>
-                <input type="text" id="password" name="password" autocomplete="off" placeholder="Ingresa tu contraseña">
+                <label for="username">
+                    Usuario
+                </label>
 
-                <button type="submit">Iniciar sesión</button>
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    autocomplete="off"
+                    placeholder="Ingresa tu usuario"
+                    required
+                >
+
+                <label for="password">
+                    Contraseña
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    autocomplete="off"
+                    placeholder="Ingresa tu contraseña"
+                    required
+                >
+
+                <button type="submit">
+                    Iniciar sesión
+                </button>
+
             </form>
 
             {% if mensaje %}
-            <div class="mensaje {{ 'exito' if '✅' in mensaje else ('error' if '❌' in mensaje else '') }}">
-                {{ mensaje }}
-            </div>
+                <div class="mensaje {{ 'exito' if 'Acceso concedido' in mensaje else 'error' }}">
+                    {{ mensaje }}
+                </div>
             {% endif %}
 
             <div class="pie">
-                <strong>Grupo 5</strong> · Maribel Iza . Ana Lojan · Jessica Macias · Jefefrson Quishpe · Juana  Suarez · Joselyn Toaquiza · José Zambrano
+                <strong>Grupo 5</strong>
+                <p>
+                    Maribel Iza · Ana Lojan · Jessica Macías ·
+                    Jefferson Quishpe · Juana Suarez ·
+                    Joselyn Toaquiza · José Zambrano
+                </p>
             </div>
+
         </div>
     </div>
 </body>
