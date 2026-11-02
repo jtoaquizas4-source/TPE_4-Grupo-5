@@ -1,195 +1,249 @@
-
 # MANUAL DE USO Y PRUEBAS
 
-## Aplicación web vulnerable a SQL Injection — Práctica 4
+## Práctica Experimental 4 – Seguridad Informática
+**Grupo 5**
 
-### 1. Objetivo del manual
+### 1. Objetivo
 
-Describir los procedimientos necesarios para configurar, ejecutar y verificar el funcionamiento de la aplicación web desarrollada con Python, Flask y SQLite, incluyendo la simulación controlada de SQL Injection y la validación de su mitigación mediante consultas parametrizadas.
+Describir los procedimientos para instalar, ejecutar y comprobar el funcionamiento de una aplicación web desarrollada con Python, Flask y SQLite, demostrando una vulnerabilidad de SQL Injection y su mitigación mediante consultas parametrizadas.
 
-Las pruebas deben realizarse exclusivamente en un entorno académico local y controlado.
+Adicionalmente, se incluye un escáner de puertos TCP para verificar la disponibilidad del servidor de pruebas.
+
+Todas las actividades deben realizarse exclusivamente en un entorno local y autorizado.
 
 ### 2. Requisitos previos
 
-Para ejecutar la aplicación se utilizaron las siguientes herramientas:
+Para ejecutar el proyecto se requiere:
 
-- Python 3.11.9.
-- PyCharm como entorno de desarrollo.
-- Git para clonar el repositorio.
-- Flask 3.1.3 y sus dependencias.
-- SQLite como sistema de base de datos.
+- Python 3.11 o una versión compatible con el código.
+- Visual Studio Code, PyCharm u otro editor de código.
+- Git.
+- Flask.
+- Requests.
+- SQLite, incluido en la biblioteca estándar de Python.
 - Navegador web.
 
 **Repositorio del proyecto:**
 
 https://github.com/jtoaquizas4-source/TPE_4-Grupo-5
 
-### 3. Instalación y configuración
+### 3. Estructura del proyecto
+
+El proyecto contiene los siguientes archivos:
+
+| Archivo | Descripción |
+|---|---|
+| `app_vulnerable.py` | Aplicación con vulnerabilidad SQL Injection intencional |
+| `app_segura.py` | Aplicación protegida mediante consultas parametrizadas |
+| `ataque_sql_i.py` | Ejecución automatizada de tres pruebas SQL Injection |
+| `escaneo_red.py` | Escáner de puertos TCP |
+| `templates/login.html` | Formulario web de autenticación |
+| `usuarios.db` | Base de datos SQLite |
+| `requirements.txt` | Dependencias del proyecto |
+| `README.md` | Información general del proyecto |
+| `MANUAL_USO.md` | Instrucciones de instalación, ejecución y pruebas |
+
+### 4. Instalación y configuración
 
 **Paso 1. Clonar el repositorio**
 
-Desde PyCharm, seleccionar la opción **Clone Repository** e introducir la URL del repositorio.
+Abrir una terminal y ejecutar:
 
-Alternativamente, ejecutar el siguiente comando:
-
-
+```bash
 git clone https://github.com/jtoaquizas4-source/TPE_4-Grupo-5.git
+cd TPE_4-Grupo-5
+```
 
+Abrir la carpeta del proyecto en Visual Studio Code o PyCharm.
 
-Abrir el proyecto `TPE_4-Grupo-5` en PyCharm.
+**Paso 2. Crear un entorno virtual (recomendado)**
 
-**Paso 2. Configurar el intérprete de Python**
+```bash
+python -m venv .venv
+```
 
-Configurar Python 3.11.9 y crear un entorno virtual `.venv` para administrar las dependencias del proyecto de manera independiente.
+En PowerShell, activar el entorno mediante:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
 
 **Paso 3. Instalar las dependencias**
 
-En la terminal de PyCharm, con el entorno virtual activado, ejecutar:
-
-
+```bash
 python -m pip install -r requirements.txt
+```
 
+El archivo `requirements.txt` debe incluir las bibliotecas Flask y Requests.
 
-Verificar que la instalación finalice sin errores. Durante la práctica se instaló correctamente Flask 3.1.3 junto con sus dependencias.
+### 5. Ejecución de la aplicación vulnerable
 
-### 4. Ejecución de la aplicación web
+Abrir una terminal dentro de la carpeta del proyecto y ejecutar:
 
-**Paso 1. Iniciar el servidor**
-
-En la terminal de PyCharm, ejecutar:
-
-
+```bash
 python app_vulnerable.py
+```
 
-
-**Paso 2. Comprobar el servidor**
-
-Verificar que la terminal muestre la dirección local:
-
-
-Running on http://127.0.0.1:5000
-
-
-**Paso 3. Acceder a la aplicación**
-
-Abrir el navegador e ingresar la siguiente dirección:
+El servidor debe iniciarse en:
 
 http://127.0.0.1:5000
 
-Se visualizará el formulario de autenticación con los campos Usuario y Contraseña.
+Abrir esa dirección en el navegador para visualizar el formulario de inicio de sesión.
 
-### 5. Verificación del inicio de sesión
+**Importante:** mantener abierta la terminal del servidor mientras se realizan las pruebas.
+
+### 6. Verificación de la autenticación
 
 **Prueba 1. Credenciales válidas**
-
-Ingresar los siguientes datos de prueba:
-
-- Usuario: `admin`
-- Contraseña: `admin123`
-
-**Resultado obtenido:** el sistema permitió el acceso y mostró el mensaje de bienvenida al administrador.
-
-**Prueba 2. Credenciales inválidas**
-
-Ingresar los siguientes datos:
-
-- Usuario: `admin`
-- Contraseña: `incorrecta123`
-
-**Resultado esperado:** el sistema debe rechazar el inicio de sesión y mostrar el mensaje «Usuario o contraseña incorrectos».
-
-### 6. Demostración de SQL Injection
-
-**Paso 1. Utilizar la versión vulnerable**
-
-Ejecutar la versión original de `app_vulnerable.py`, antes de aplicar la corrección.
-
-La consulta de autenticación se construía incorporando directamente los valores ingresados en el formulario:
-
-
-query = f"SELECT * FROM usuarios WHERE username = '{username}' AND password = '{password}'"
-cursor.execute(query)
-
-
-**Paso 2. Introducir la entrada de prueba**
-
-En el formulario web, ingresar los siguientes valores:
-
-- Usuario: `' OR 1=1 -- `
-- Contraseña: `Jota25`
-
-Seleccionar **Iniciar sesión**.
-
-**Paso 3. Verificar el resultado**
-
-**Resultado obtenido:** la aplicación concedió acceso como administrador sin utilizar la contraseña legítima.
-
-La terminal de PyCharm mostró la consulta SQL manipulada:
-
-
-SELECT * FROM usuarios
-WHERE username = '' OR 1=1 -- ' AND password = 'Jota25'
-
-
-La condición `OR 1=1` introdujo una expresión siempre verdadera, mientras que `--` convirtió el resto de la instrucción en un comentario SQL, evitando la comprobación de la contraseña.
-
-Esta prueba confirmó la existencia de una vulnerabilidad de SQL Injection en el proceso de autenticación.
-
-### 7. Implementación de la mitigación
-
-**Paso 1. Modificar la consulta vulnerable**
-
-En la función `login()` del archivo `app_vulnerable.py`, reemplazar la consulta insegura por una consulta parametrizada:
-
-
-query = "SELECT * FROM usuarios WHERE username = ? AND password = ?"
-cursor.execute(query, (username, password))
-
-
-Los parámetros permiten que SQLite procese los valores ingresados como datos y no como instrucciones SQL, evitando la manipulación de la estructura de la consulta.
-
-**Paso 2. Guardar los cambios**
-
-Guardar el archivo y reiniciar el servidor Flask para aplicar la modificación.
-
-La corrección se desarrolló en la rama `jose-mitigacion-sqli`, manteniendo separada la versión original del proyecto.
-
-### 8. Validación de la mitigación
-
-**Prueba 1. Repetir el intento de SQL Injection**
-
-Ingresar nuevamente:
-
-- Usuario: `' OR 1=1 -- `
-- Contraseña: `Jota25`
-
-**Resultado obtenido:** la aplicación rechazó el acceso y mostró el mensaje «Usuario o contraseña incorrectos».
-
-**Prueba 2. Verificar la autenticación legítima**
 
 Ingresar:
 
 - Usuario: `admin`
 - Contraseña: `admin123`
 
-**Resultado obtenido:** la aplicación concedió acceso correctamente al administrador.
+**Resultado esperado:** acceso concedido y mensaje de bienvenida al administrador, siempre que la base de datos contenga esas credenciales.
 
-La consola de PyCharm confirmó que la aplicación utilizaba una consulta parametrizada:
+**Prueba 2. Credenciales inválidas**
 
+Ingresar:
 
-SELECT * FROM usuarios
-WHERE username = ? AND password = ?
+- Usuario: `admin`
+- Contraseña: `incorrecta123`
 
+**Resultado esperado:** mensaje «Usuario o contraseña incorrectos».
 
-Las pruebas demostraron que la contramedida impidió el bypass de autenticación previamente identificado, manteniendo el funcionamiento normal del inicio de sesión legítimo.
+### 7. Demostración de SQL Injection
 
-### 9. Evidencias de ejecución
+La aplicación `app_vulnerable.py` construye la consulta SQL incorporando directamente los valores del formulario:
 
-Las principales evidencias obtenidas durante la práctica corresponden a:
+```python
+query = (
+    f"SELECT * FROM usuarios "
+    f"WHERE username = '{username}' "
+    f"AND password = '{password}'"
+)
 
-1. Ejecución del servidor Flask y acceso a la aplicación web.
-2. Consulta SQL vulnerable y acceso indebido mediante SQL Injection.
-3. Rechazo del intento de inyección SQL después de aplicar la mitigación.
-4. Consulta parametrizada y funcionamiento de la autenticación legítima.
+cursor.execute(query)
+```
 
-Las capturas seleccionadas se incorporarán al informe técnico grupal, acompañadas de la explicación de los procedimientos y los resultados comprobados.
+Esta implementación permite que una entrada especialmente construida modifique la condición de autenticación.
+
+**Paso 1. Mantener iniciada la aplicación vulnerable.**
+
+**Paso 2. Abrir una segunda terminal y ejecutar:**
+
+```bash
+python ataque_sql_i.py --modo vulnerable
+```
+
+El programa realiza tres pruebas con las siguientes entradas:
+
+1. `admin' --`
+2. `' OR '1'='1`
+3. `x' OR '1'='1' --`
+
+**Paso 3. Revisar los resultados.**
+
+El programa muestra el código HTTP, si el acceso fue concedido o rechazado y un resumen de las tres pruebas.
+
+**Resultado esperado:** al menos una entrada debe permitir eludir la comprobación de contraseña en la aplicación vulnerable, si la consulta y los datos corresponden a la configuración descrita.
+
+El resultado real debe comprobarse en la terminal y documentarse mediante capturas de pantalla.
+
+### 8. Mitigación de SQL Injection
+
+La aplicación `app_segura.py` implementa consultas parametrizadas:
+
+```python
+query = (
+    "SELECT * FROM usuarios "
+    "WHERE username = ? AND password = ?"
+)
+
+cursor.execute(query, (username, password))
+```
+
+Los parámetros permiten que SQLite trate los valores ingresados como datos y no como instrucciones SQL.
+
+**No se debe modificar `app_vulnerable.py` para aplicar la mitigación**, porque ambas versiones se mantienen separadas con fines comparativos.
+
+### 9. Validación de la mitigación
+
+**Paso 1. Detener la aplicación vulnerable.**
+
+En la terminal donde está ejecutándose Flask, presionar `Ctrl + C`.
+
+**Paso 2. Iniciar la aplicación segura.**
+
+```bash
+python app_segura.py
+```
+
+**Paso 3. Ejecutar las mismas pruebas en otra terminal.**
+
+```bash
+python ataque_sql_i.py --modo segura
+```
+
+**Resultado esperado:** los tres intentos de SQL Injection deben ser rechazados.
+
+**Paso 4. Comprobar la autenticación legítima.**
+
+En el navegador, ingresar:
+
+- Usuario: `admin`
+- Contraseña: `admin123`
+
+**Resultado esperado:** acceso concedido al administrador, si las credenciales coinciden con las registradas en la base de datos.
+
+Las aplicaciones vulnerable y segura utilizan el puerto `5000`; por lo tanto, deben ejecutarse por separado.
+
+### 10. Escaneo de puertos TCP
+
+El archivo `escaneo_red.py` permite verificar qué puertos TCP están abiertos en un equipo autorizado.
+
+**Paso 1. Mantener iniciado uno de los servidores Flask.**
+
+**Paso 2. Ejecutar el escáner.**
+
+```bash
+python escaneo_red.py
+```
+
+El programa solicita una dirección IPv4 y un rango de puertos.
+
+Para utilizar los valores predeterminados, presionar Enter en cada campo:
+
+- Dirección IPv4: `127.0.0.1`
+- Puerto inicial: `4995`
+- Puerto final: `5005`
+
+También puede ejecutarse directamente:
+
+```bash
+python escaneo_red.py 127.0.0.1 4995 5005
+```
+
+**Resultado esperado:** el puerto TCP `5000` debe aparecer abierto cuando el servidor Flask está funcionando.
+
+El escáner permite comprobar la disponibilidad del puerto, pero no determina si la aplicación activa es la vulnerable o la segura.
+
+### 11. Evidencias de ejecución
+
+Para documentar la práctica se deben obtener capturas de:
+
+1. Inicio del servidor Flask y visualización del formulario.
+2. Autenticación con credenciales válidas e inválidas.
+3. Ejecución de las tres pruebas SQL Injection contra la aplicación vulnerable.
+4. Consulta SQL vulnerable y resultado obtenido.
+5. Ejecución de las mismas pruebas contra la aplicación segura.
+6. Consulta SQL parametrizada y resultado obtenido.
+7. Escaneo TCP que muestre el estado del puerto `5000`.
+
+Las capturas deben incorporarse al informe técnico grupal, explicando los resultados efectivamente observados.
+
+### 12. Consideraciones finales
+
+La práctica permite comparar una consulta SQL vulnerable con una consulta parametrizada, identificar los efectos de la manipulación de entradas y comprobar la mitigación mediante pruebas controladas.
+
+El proyecto es exclusivamente académico. No debe desplegarse la aplicación vulnerable en servidores públicos ni utilizarse para evaluar sistemas sin autorización.
